@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ChevronDown, Menu, Search, X } from "lucide-react";
@@ -8,6 +8,7 @@ import { ChevronDown, Menu, Search, X } from "lucide-react";
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,7 +17,7 @@ const Navbar = () => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     console.log("Search for:", searchQuery);
-    // In a real implementation, this would redirect to search results
+    navigate(`/jobs?query=${encodeURIComponent(searchQuery)}`);
   };
 
   return (
@@ -59,7 +60,7 @@ const Navbar = () => {
               </button>
               <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="py-1">
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Find Jobs</Link>
+                  <Link to="/jobs" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Find Jobs</Link>
                   <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Saved Jobs</Link>
                   <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Proposals</Link>
                   <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</Link>
@@ -117,9 +118,11 @@ const Navbar = () => {
               <Link to="/login" className="text-upwork-black hover:text-upwork-green font-medium">
                 Log In
               </Link>
-              <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white">
-                Sign Up
-              </Button>
+              <Link to="/signup">
+                <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white">
+                  Sign Up
+                </Button>
+              </Link>
             </div>
 
             {/* Mobile menu button */}
@@ -154,7 +157,7 @@ const Navbar = () => {
               <Link to="#" className="block py-2 text-upwork-black">
                 Find Talent
               </Link>
-              <Link to="#" className="block py-2 text-upwork-black">
+              <Link to="/jobs" className="block py-2 text-upwork-black">
                 Find Work
               </Link>
               <Link to="#" className="block py-2 text-upwork-black">
@@ -167,9 +170,11 @@ const Navbar = () => {
                 <Link to="/login" className="block py-2 text-upwork-black">
                   Log In
                 </Link>
-                <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white w-full">
-                  Sign Up
-                </Button>
+                <Link to="/signup" className="block">
+                  <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white w-full">
+                    Sign Up
+                  </Button>
+                </Link>
               </div>
             </div>
           </div>

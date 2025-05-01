@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const CtaSection = () => {
   return (
@@ -13,11 +14,15 @@ const CtaSection = () => {
           Work with the largest network of independent professionals and get things done—from quick turnarounds to big transformations.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
-          <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8 text-lg">
-            Find Talent
+          <Button asChild className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8 text-lg">
+            <Link to="/signup">
+              Find Talent
+            </Link>
           </Button>
-          <Button variant="outline" className="text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8 text-lg">
-            Learn How to Hire <ArrowRight className="ml-2 h-5 w-5" />
+          <Button asChild variant="outline" className="text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8 text-lg">
+            <Link to="#">
+              Learn How to Hire <ArrowRight className="ml-2 h-5 w-5" />
+            </Link>
           </Button>
         </div>
       </div>

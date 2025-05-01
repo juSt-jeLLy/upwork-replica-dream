@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const HeroSection = () => {
   return (
@@ -17,11 +18,15 @@ const HeroSection = () => {
               Right now. Right here.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="text-lg bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8">
-                Find Talent
+              <Button asChild className="text-lg bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8">
+                <Link to="/signup">
+                  Find Talent
+                </Link>
               </Button>
-              <Button variant="outline" className="text-lg text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8">
-                Find Work
+              <Button asChild variant="outline" className="text-lg text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8">
+                <Link to="/jobs">
+                  Find Work
+                </Link>
               </Button>
             </div>
             <div className="mt-10">
