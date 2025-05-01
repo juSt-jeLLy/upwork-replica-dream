@@ -11,6 +11,10 @@ import Signup from "./pages/Signup";
 import ForgotPassword from "./pages/ForgotPassword";
 import NotFound from "./pages/NotFound";
 import PostJob from "./pages/PostJob";
+import FindTalent from "./pages/FindTalent";
+import FindWork from "./pages/FindWork";
+import Enterprise from "./pages/Enterprise";
+import About from "./pages/About";
 
 const queryClient = new QueryClient();
 
@@ -27,6 +31,10 @@ const App = () => (
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/find-talent" element={<FindTalent />} />
+          <Route path="/find-work" element={<FindWork />} />
+          <Route path="/enterprise" element={<Enterprise />} />
+          <Route path="/about" element={<About />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

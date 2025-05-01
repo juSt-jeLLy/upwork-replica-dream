@@ -30,15 +30,17 @@ const TalentSection = () => {
               ))}
             </ul>
             
-            <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8 text-lg">
-              Find Talent
+            <Button asChild className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8 text-lg">
+              <Link to="/find-talent">
+                Find Talent
+              </Link>
             </Button>
           </div>
           
           <div className="order-1 lg:order-2">
             <div className="rounded-lg overflow-hidden shadow-xl">
               <img 
-                src="https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5" 
+                src="https://images.unsplash.com/photo-1521737711867-e3b97375f2b5" 
                 alt="People collaborating on project" 
                 className="w-full h-full object-cover"
               />

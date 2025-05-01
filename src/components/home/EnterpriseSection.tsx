@@ -1,6 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Building, Users, Shield, Clock } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const features = [
   {
@@ -54,8 +55,10 @@ const EnterpriseSection = () => {
               ))}
             </div>
             
-            <Button className="bg-white text-upwork-dark-green hover:bg-gray-100 font-medium">
-              Learn About Enterprise
+            <Button asChild className="bg-white text-upwork-dark-green hover:bg-gray-100 font-medium">
+              <Link to="/enterprise">
+                Learn About Enterprise
+              </Link>
             </Button>
           </div>
           

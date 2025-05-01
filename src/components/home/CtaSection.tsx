@@ -15,7 +15,7 @@ const CtaSection = () => {
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4">
           <Button asChild className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8 text-lg">
-            <Link to="/signup">
+            <Link to="/find-talent">
               Find Talent
             </Link>
           </Button>

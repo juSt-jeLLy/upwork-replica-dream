@@ -19,12 +19,12 @@ const HeroSection = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button asChild className="text-lg bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8">
-                <Link to="/signup">
+                <Link to="/find-talent">
                   Find Talent
                 </Link>
               </Button>
               <Button asChild variant="outline" className="text-lg text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8">
-                <Link to="/jobs">
+                <Link to="/find-work">
                   Find Work
                 </Link>
               </Button>
