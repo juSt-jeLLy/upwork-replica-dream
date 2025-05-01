@@ -20,8 +20,8 @@ const CtaSection = () => {
             </Link>
           </Button>
           <Button asChild variant="outline" className="text-upwork-green border-upwork-green hover:bg-upwork-green/5 font-medium py-6 px-8 text-lg">
-            <Link to="#">
-              Learn How to Hire <ArrowRight className="ml-2 h-5 w-5" />
+            <Link to="/post-job">
+              Post a Job <ArrowRight className="ml-2 h-5 w-5" />
             </Link>
           </Button>
         </div>
