@@ -1,21 +1,44 @@
-
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
+
+interface LocationState {
+  from?: string;
+}
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { login } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const state = location.state as LocationState;
+  const redirectPath = state?.from || "/dashboard";
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password, rememberMe });
-    // In a real app, this would connect to authentication
+    setIsLoading(true);
+    
+    try {
+      await login(email, password);
+      toast.success("Logged in successfully!");
+      
+      // Redirect user to the intended page or dashboard
+      navigate(redirectPath, { replace: true });
+    } catch (error) {
+      toast.error("Invalid credentials. Please try again.");
+      console.error("Login error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -40,6 +63,7 @@ const Login = () => {
                 required
                 placeholder="Email or Username"
                 className="w-full"
+                disabled={isLoading}
               />
             </div>
 
@@ -55,6 +79,7 @@ const Login = () => {
                 required
                 placeholder="Password"
                 className="w-full"
+                disabled={isLoading}
               />
             </div>
 
@@ -65,6 +90,7 @@ const Login = () => {
                   checked={rememberMe}
                   onCheckedChange={(checked) => setRememberMe(checked === true)}
                   className="h-4 w-4 text-upwork-green focus:ring-upwork-green"
+                  disabled={isLoading}
                 />
                 <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-700">
                   Keep me logged in
@@ -76,9 +102,28 @@ const Login = () => {
               </Link>
             </div>
 
-            <Button type="submit" className="w-full bg-upwork-green hover:bg-upwork-dark-green text-white py-6">
-              Log In
+            <Button 
+              type="submit" 
+              className="w-full bg-upwork-green hover:bg-upwork-dark-green text-white py-6"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  Logging in...
+                </div>
+              ) : (
+                "Log In"
+              )}
             </Button>
+            
+            {/* Demo account info for easy testing */}
+            <div className="mt-4 p-3 bg-gray-50 rounded text-sm">
+              <p className="font-medium mb-1">Demo Accounts:</p>
+              <p><span className="font-medium">Freelancer:</span> john@example.com</p>
+              <p><span className="font-medium">Client:</span> jane@example.com</p>
+              <p className="text-xs text-gray-500 mt-1">Any password will work for these demo accounts</p>
+            </div>
           </form>
 
           <div className="mt-8 text-center">

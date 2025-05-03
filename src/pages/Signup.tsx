@@ -1,11 +1,19 @@
-
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Signup = () => {
   const [email, setEmail] = useState("");
@@ -13,12 +21,41 @@ const Signup = () => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [country, setCountry] = useState("");
+  const [role, setRole] = useState<"freelancer" | "client">("freelancer");
   const [agreeTerms, setAgreeTerms] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { signup } = useAuth();
+  const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Signup attempted with:", { email, password, firstName, lastName, country });
-    // In a real app, this would connect to authentication
+    
+    if (!agreeTerms) {
+      toast.error("You must agree to the terms of service");
+      return;
+    }
+    
+    setIsLoading(true);
+    
+    try {
+      await signup({
+        firstName,
+        lastName,
+        email,
+        password,
+        country,
+        role,
+      });
+      
+      toast.success("Account created successfully!");
+      navigate("/dashboard", { replace: true });
+    } catch (error: any) {
+      toast.error(error.message || "Failed to create account");
+      console.error("Signup error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -43,6 +80,7 @@ const Signup = () => {
                   onChange={(e) => setFirstName(e.target.value)}
                   required
                   className="w-full"
+                  disabled={isLoading}
                 />
               </div>
               <div>
@@ -56,6 +94,7 @@ const Signup = () => {
                   onChange={(e) => setLastName(e.target.value)}
                   required
                   className="w-full"
+                  disabled={isLoading}
                 />
               </div>
             </div>
@@ -71,6 +110,7 @@ const Signup = () => {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 className="w-full"
+                disabled={isLoading}
               />
             </div>
 
@@ -86,6 +126,7 @@ const Signup = () => {
                 required
                 minLength={8}
                 className="w-full"
+                disabled={isLoading}
               />
             </div>
 
@@ -100,7 +141,23 @@ const Signup = () => {
                 onChange={(e) => setCountry(e.target.value)}
                 required
                 className="w-full"
+                disabled={isLoading}
               />
+            </div>
+            
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">
+                I want to
+              </label>
+              <Select value={role} onValueChange={(value: "freelancer" | "client") => setRole(value)} disabled={isLoading}>
+                <SelectTrigger id="role" className="w-full">
+                  <SelectValue placeholder="Select your role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="freelancer">Work as a freelancer</SelectItem>
+                  <SelectItem value="client">Hire for a project</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="flex items-start">
@@ -109,6 +166,7 @@ const Signup = () => {
                 checked={agreeTerms}
                 onCheckedChange={(checked) => setAgreeTerms(checked === true)}
                 className="h-4 w-4 mt-1 text-upwork-green focus:ring-upwork-green"
+                disabled={isLoading}
               />
               <label htmlFor="agree-terms" className="ml-2 block text-sm text-gray-700">
                 Yes, I understand and agree to the Upwork Terms of Service, including the User Agreement and Privacy Policy
@@ -118,9 +176,16 @@ const Signup = () => {
             <Button 
               type="submit" 
               className="w-full bg-upwork-green hover:bg-upwork-dark-green text-white py-6"
-              disabled={!agreeTerms}
+              disabled={isLoading || !agreeTerms}
             >
-              Create My Account
+              {isLoading ? (
+                <div className="flex items-center justify-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white mr-2"></div>
+                  Creating Account...
+                </div>
+              ) : (
+                "Create My Account"
+              )}
             </Button>
           </form>
 

@@ -1,14 +1,32 @@
-
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ChevronDown, Menu, Search, X } from "lucide-react";
+import { 
+  ChevronDown, 
+  Menu, 
+  Search, 
+  X, 
+  Briefcase, 
+  PlusSquare,
+  LogOut, 
+  User as UserIcon 
+} from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
+  const { user, logout, isAuthenticated } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -16,8 +34,15 @@ const Navbar = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Search for:", searchQuery);
-    navigate(`/jobs?query=${encodeURIComponent(searchQuery)}`);
+    if (searchQuery.trim()) {
+      navigate(`/jobs?query=${encodeURIComponent(searchQuery)}`);
+      setSearchQuery("");
+    }
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
   };
 
   return (
@@ -45,10 +70,10 @@ const Navbar = () => {
               </button>
               <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="py-1">
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Post a Job</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Talent Marketplace</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Project Catalog</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Talent Scout</Link>
+                  <Link to="/post-job" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Post a Job</Link>
+                  <Link to="/find-talent" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Talent Marketplace</Link>
+                  <Link to="/find-talent" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Project Catalog</Link>
+                  <Link to="/find-talent" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Talent Scout</Link>
                 </div>
               </div>
             </div>
@@ -61,9 +86,9 @@ const Navbar = () => {
               <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="py-1">
                   <Link to="/jobs" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Find Jobs</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Saved Jobs</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Proposals</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</Link>
+                  <Link to="/find-work" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Saved Jobs</Link>
+                  <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Proposals</Link>
+                  <Link to="/dashboard" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Profile</Link>
                 </div>
               </div>
             </div>
@@ -75,10 +100,10 @@ const Navbar = () => {
               </button>
               <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="py-1">
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Success Stories</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reviews</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">How to Hire</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">How to Find Work</Link>
+                  <Link to="/about" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Success Stories</Link>
+                  <Link to="/about" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Reviews</Link>
+                  <Link to="/find-talent" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">How to Hire</Link>
+                  <Link to="/find-work" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">How to Find Work</Link>
                 </div>
               </div>
             </div>
@@ -90,9 +115,9 @@ const Navbar = () => {
               </button>
               <div className="absolute left-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 z-50">
                 <div className="py-1">
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Enterprise Overview</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hire an Agency</Link>
-                  <Link to="#" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Compliance Solutions</Link>
+                  <Link to="/enterprise" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Enterprise Overview</Link>
+                  <Link to="/enterprise" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Hire an Agency</Link>
+                  <Link to="/enterprise" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Compliance Solutions</Link>
                 </div>
               </div>
             </div>
@@ -112,17 +137,64 @@ const Navbar = () => {
             </form>
           </div>
 
-          {/* Right side - Login/Signup */}
+          {/* Right side - Login/Signup or User Menu */}
           <div className="flex items-center">
             <div className="hidden md:flex items-center space-x-4">
-              <Link to="/login" className="text-upwork-black hover:text-upwork-green font-medium">
-                Log In
-              </Link>
-              <Link to="/signup">
-                <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white">
-                  Sign Up
-                </Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" className="flex items-center text-upwork-black hover:text-upwork-green font-medium">
+                    <Briefcase className="mr-1 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  
+                  {user?.role === 'client' && (
+                    <Link to="/post-job">
+                      <Button variant="outline" className="flex items-center">
+                        <PlusSquare className="mr-1 h-4 w-4" />
+                        Post Job
+                      </Button>
+                    </Link>
+                  )}
+                  
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                        <div className="flex items-center justify-center h-8 w-8 rounded-full bg-upwork-green text-white">
+                          {user ? user.firstName.charAt(0) + user.lastName.charAt(0) : <UserIcon className="h-4 w-4" />}
+                        </div>
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                        <UserIcon className="mr-2 h-4 w-4" />
+                        <span>Profile</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onClick={() => navigate('/dashboard')}>
+                        <Briefcase className="mr-2 h-4 w-4" />
+                        <span>My Jobs</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onClick={handleLogout}>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        <span>Log out</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="text-upwork-black hover:text-upwork-green font-medium">
+                    Log In
+                  </Link>
+                  <Link to="/signup">
+                    <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
 
             {/* Mobile menu button */}
@@ -154,28 +226,50 @@ const Navbar = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             </form>
             <div className="space-y-1">
-              <Link to="#" className="block py-2 text-upwork-black">
+              <Link to="/find-talent" className="block py-2 text-upwork-black">
                 Find Talent
               </Link>
-              <Link to="/jobs" className="block py-2 text-upwork-black">
+              <Link to="/find-work" className="block py-2 text-upwork-black">
                 Find Work
               </Link>
-              <Link to="#" className="block py-2 text-upwork-black">
+              <Link to="/about" className="block py-2 text-upwork-black">
                 Why Upwork
               </Link>
-              <Link to="#" className="block py-2 text-upwork-black">
+              <Link to="/enterprise" className="block py-2 text-upwork-black">
                 Enterprise
               </Link>
-              <div className="pt-4 space-y-2">
-                <Link to="/login" className="block py-2 text-upwork-black">
-                  Log In
-                </Link>
-                <Link to="/signup" className="block">
-                  <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white w-full">
-                    Sign Up
-                  </Button>
-                </Link>
-              </div>
+              {isAuthenticated ? (
+                <>
+                  <Link to="/dashboard" className="block py-2 text-upwork-black flex items-center">
+                    <Briefcase className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                  {user?.role === 'client' && (
+                    <Link to="/post-job" className="block py-2 text-upwork-black flex items-center">
+                      <PlusSquare className="mr-2 h-4 w-4" />
+                      Post Job
+                    </Link>
+                  )}
+                  <button 
+                    onClick={handleLogout}
+                    className="w-full flex items-center py-2 text-upwork-black"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Log Out
+                  </button>
+                </>
+              ) : (
+                <div className="pt-4 space-y-2">
+                  <Link to="/login" className="block py-2 text-upwork-black">
+                    Log In
+                  </Link>
+                  <Link to="/signup" className="block">
+                    <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white w-full">
+                      Sign Up
+                    </Button>
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         )}

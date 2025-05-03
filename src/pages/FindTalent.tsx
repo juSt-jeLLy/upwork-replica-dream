@@ -1,11 +1,12 @@
-
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Star, User, Briefcase } from "lucide-react";
+import { ArrowRight, Star, User, Briefcase, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 const talentCategories = [
   {
@@ -74,6 +75,45 @@ const featuredTalent = [
 ];
 
 const FindTalent = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredTalent, setFilteredTalent] = useState(featuredTalent);
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Parse search query from URL
+  useEffect(() => {
+    const queryParams = new URLSearchParams(location.search);
+    const query = queryParams.get("query");
+    if (query) {
+      setSearchQuery(query);
+      filterTalentByQuery(query);
+    }
+  }, [location.search]);
+
+  const filterTalentByQuery = (query: string) => {
+    if (!query.trim()) {
+      setFilteredTalent(featuredTalent);
+      return;
+    }
+    
+    const filtered = featuredTalent.filter(talent => 
+      talent.name.toLowerCase().includes(query.toLowerCase()) ||
+      talent.title.toLowerCase().includes(query.toLowerCase()) ||
+      talent.description.toLowerCase().includes(query.toLowerCase()) ||
+      talent.skills.some(skill => skill.toLowerCase().includes(query.toLowerCase()))
+    );
+    
+    setFilteredTalent(filtered);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/find-talent?query=${encodeURIComponent(searchQuery)}`);
+      filterTalentByQuery(searchQuery);
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -88,6 +128,24 @@ const FindTalent = () => {
               <p className="text-xl text-upwork-gray mb-8 max-w-2xl mx-auto">
                 Work with the largest network of independent professionals and get things done—from quick turnarounds to big transformations.
               </p>
+              
+              <div className="bg-white p-6 rounded-lg shadow-md mb-8">
+                <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-grow">
+                    <Input 
+                      placeholder="Search for talent (e.g. React Developer, UI Designer)" 
+                      className="h-12 text-lg"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button type="submit" className="h-12 bg-upwork-green hover:bg-upwork-dark-green text-white font-medium">
+                    <Search className="mr-2 h-5 w-5" />
+                    Search Talent
+                  </Button>
+                </form>
+              </div>
+              
               <Button className="text-lg bg-upwork-green hover:bg-upwork-dark-green text-white font-medium py-6 px-8">
                 Post a Job
               </Button>
@@ -126,53 +184,77 @@ const FindTalent = () => {
         <section className="py-16 bg-gray-50">
           <div className="container-custom">
             <h2 className="heading-lg mb-2">Featured talent</h2>
+            {searchQuery && (
+              <p className="text-lg text-upwork-gray mb-4">
+                {filteredTalent.length === 0 
+                  ? `No results found for "${searchQuery}"`
+                  : `${filteredTalent.length} ${filteredTalent.length === 1 ? 'talent' : 'talents'} found for "${searchQuery}"`
+                }
+              </p>
+            )}
             <p className="text-lg text-upwork-gray mb-8">
               Browse our top-rated professionals for your projects
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {featuredTalent.map((talent, index) => (
-                <Card key={index} className="hover:shadow-lg transition-shadow">
-                  <CardContent className="p-6">
-                    <div className="flex items-start gap-4">
-                      <img 
-                        src={talent.image} 
-                        alt={talent.name} 
-                        className="h-16 w-16 rounded-full object-cover" 
-                      />
-                      <div>
-                        <h3 className="font-bold text-xl mb-1">{talent.name}</h3>
-                        <p className="text-upwork-gray mb-2">{talent.title}</p>
-                        <div className="flex items-center text-sm mb-2">
-                          <Star className="h-4 w-4 text-yellow-400 fill-yellow-400 mr-1" />
-                          <span className="font-medium mr-3">{talent.rating}</span>
-                          <span className="flex items-center">
-                            <Briefcase className="h-4 w-4 mr-1 text-upwork-gray" />
-                            {talent.jobsCompleted} jobs
-                          </span>
-                          <Badge className="ml-3">{talent.rate}</Badge>
+            {filteredTalent.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {filteredTalent.map((talent, index) => (
+                  <Card key={index} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex items-start gap-4">
+                        <img 
+                          src={talent.image} 
+                          alt={talent.name} 
+                          className="h-16 w-16 rounded-full object-cover" 
+                        />
+                        <div>
+                          <h3 className="font-bold text-xl mb-1">{talent.name}</h3>
+                          <p className="text-upwork-gray mb-2">{talent.title}</p>
+                          <div className="flex items-center text-sm mb-2">
+                            <Star className="h-4 w-4 text-yellow-400 fill-yellow-400 mr-1" />
+                            <span className="font-medium mr-3">{talent.rating}</span>
+                            <span className="flex items-center">
+                              <Briefcase className="h-4 w-4 mr-1 text-upwork-gray" />
+                              {talent.jobsCompleted} jobs
+                            </span>
+                            <Badge className="ml-3">{talent.rate}</Badge>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <p className="text-sm text-upwork-gray my-4">
-                      {talent.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2 my-3">
-                      {talent.skills.map((skill, skillIndex) => (
-                        <Badge key={skillIndex} variant="secondary">{skill}</Badge>
-                      ))}
-                    </div>
-                    <Button variant="outline" className="text-upwork-green border-upwork-green hover:bg-upwork-green/5 w-full mt-4">
-                      View Profile
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-            <div className="text-center mt-10">
-              <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium">
-                Browse All Talent
-              </Button>
-            </div>
+                      <p className="text-sm text-upwork-gray my-4">
+                        {talent.description}
+                      </p>
+                      <div className="flex flex-wrap gap-2 my-3">
+                        {talent.skills.map((skill, skillIndex) => (
+                          <Badge key={skillIndex} variant="secondary">{skill}</Badge>
+                        ))}
+                      </div>
+                      <Button variant="outline" className="text-upwork-green border-upwork-green hover:bg-upwork-green/5 w-full mt-4">
+                        View Profile
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+                <h2 className="text-xl font-semibold mb-2">No talent found</h2>
+                <p className="text-gray-600 mb-4">
+                  We couldn't find any talent matching your search criteria.
+                </p>
+                <Button onClick={() => {
+                  setSearchQuery("");
+                  setFilteredTalent(featuredTalent);
+                  navigate("/find-talent");
+                }}>Clear Search</Button>
+              </div>
+            )}
+            {filteredTalent.length > 0 && (
+              <div className="text-center mt-10">
+                <Button className="bg-upwork-green hover:bg-upwork-dark-green text-white font-medium">
+                  Browse All Talent
+                </Button>
+              </div>
+            )}
           </div>
         </section>
       </main>

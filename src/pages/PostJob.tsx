@@ -1,11 +1,12 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { ArrowRight, Check } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
+import { useJobsStore, JobWithMilestones } from "@/stores/JobsStore";
 
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -33,18 +34,29 @@ import { MilestoneBuilder } from "@/components/jobs/MilestoneBuilder";
 const formSchema = z.object({
   title: z.string().min(10, {
     message: "Title must be at least 10 characters.",
+  }).max(100, {
+    message: "Title must be less than 100 characters."
   }),
   description: z.string().min(50, {
     message: "Description must be at least 50 characters.",
+  }).max(5000, {
+    message: "Description must be less than 5000 characters."
   }),
   category: z.string().min(1, {
     message: "Please select a category.",
   }),
   skills: z.string().min(3, {
     message: "Please enter at least one skill.",
+  }).refine(value => value.split(',').length <= 10, {
+    message: "Maximum 10 skills allowed."
   }),
   budget: z.string().min(1, {
     message: "Please enter a budget.",
+  }).refine(value => {
+    const parsed = parseFloat(value.replace(/[$,]/g, ''));
+    return !isNaN(parsed) && parsed > 0;
+  }, {
+    message: "Budget must be a valid positive number."
   }),
   experience: z.string().min(1, {
     message: "Please select an experience level.",
@@ -56,6 +68,8 @@ const formSchema = z.object({
 
 const PostJob = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { addJob } = useJobsStore();
   const [step, setStep] = useState(1);
   const [milestones, setMilestones] = useState<any[]>([]);
 
@@ -76,14 +90,125 @@ const PostJob = () => {
     if (step === 1) {
       setStep(2);
     } else if (step === 2 && milestones.length > 0) {
-      // Submit the job with milestones
-      console.log("Job Posted:", { ...values, milestones });
-      toast.success("Job posted successfully!");
-      navigate("/jobs");
+      try {
+        if (!user) {
+          toast.error("You must be logged in to post a job");
+          navigate("/login");
+          return;
+        }
+        
+        if (user.role !== 'client') {
+          toast.error("Only clients can post jobs");
+          return;
+        }
+        
+        // Validate milestones
+        if (milestones.length === 0) {
+          toast.error("Please add at least one milestone");
+          return;
+        }
+        
+        if (milestones.length > 10) {
+          toast.error("Maximum 10 milestones allowed");
+          return;
+        }
+        
+        // Validate milestone amounts
+        const totalBudget = milestones.reduce((sum, m) => sum + m.amount, 0);
+        const parsedBudget = parseFloat(values.budget.replace(/[$,]/g, ''));
+        
+        if (!isNaN(parsedBudget) && Math.abs(totalBudget - parsedBudget) > 0.01 * parsedBudget) {
+          toast.error("Total milestone amounts should match the project budget");
+          return;
+        }
+        
+        // Process skills properly
+        const skillsArray = values.skills
+          .split(',')
+          .map(skill => skill.trim())
+          .filter(skill => skill.length > 0);
+        
+        if (skillsArray.length === 0) {
+          toast.error("Please add at least one skill");
+          return;
+        }
+        
+        // Create the job
+        const newJob: JobWithMilestones = {
+          id: Math.random().toString(36).substring(2, 9),
+          title: values.title,
+          description: values.description,
+          rate: values.budget,
+          experienceLevel: values.experience,
+          duration: values.duration,
+          category: values.category,
+          clientId: user?.id || '',
+          clientName: `${user?.firstName} ${user?.lastName}`,
+          clientLocation: "United States", // This could come from user profile in a real app
+          clientJoined: new Date().toLocaleDateString(),
+          posted: "Just now",
+          location: "Worldwide",
+          skills: skillsArray,
+          clientRating: 5.0,
+          clientSpent: "0",
+          proposals: 0,
+          verified: true,
+          milestones: milestones.map(milestone => ({
+            ...milestone,
+            id: Math.random().toString(36).substring(2, 9),
+            status: "Not Started",
+            approved: true
+          }))
+        };
+        
+        // Record job count for rate limiting
+        if (user) {
+          const userJobsKey = 'user_jobs_count_' + user.id;
+          const userJobs = localStorage.getItem(userJobsKey);
+          const count = userJobs ? parseInt(userJobs, 10) : 0;
+          localStorage.setItem(userJobsKey, (count + 1).toString());
+        }
+        
+        addJob(newJob);
+        toast.success("Job posted successfully!");
+        navigate("/dashboard");
+      } catch (error) {
+        console.error("Error posting job:", error);
+        toast.error(error instanceof Error ? error.message : "Failed to post job");
+      }
     } else {
       toast.error("Please add at least one milestone.");
     }
   }
+
+  // Add a confirm handler when users try to leave the page with unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (form.formState.isDirty || milestones.length > 0) {
+        e.preventDefault();
+        e.returnValue = '';
+        return '';
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [form.formState.isDirty, milestones]);
+
+  // Prevent clients from posting too many jobs in a short time
+  useEffect(() => {
+    if (user?.role === 'client') {
+      const userJobs = localStorage.getItem('user_jobs_count_' + user.id);
+      const count = userJobs ? parseInt(userJobs, 10) : 0;
+      
+      if (count >= 5) {
+        toast.error("You have reached the maximum number of job postings. Please try again later.");
+        navigate("/dashboard");
+      }
+    }
+  }, [user, navigate]);
 
   return (
     <div className="flex flex-col min-h-screen">

@@ -1,11 +1,21 @@
-
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle, Building, Shield, Users, Clock, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
+import { useToast } from "@/components/ui/use-toast";
 
 const features = [
   {
@@ -78,6 +88,48 @@ const solutions = [
 ];
 
 const Enterprise = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    company: "",
+    jobTitle: "",
+    employeeCount: "",
+    message: ""
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSelectChange = (value: string) => {
+    setFormData(prev => ({ ...prev, employeeCount: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      setIsSubmitting(false);
+      toast({
+        title: "Request submitted",
+        description: "Thank you for your interest. Our sales team will contact you shortly.",
+      });
+      setFormData({
+        name: "",
+        email: "",
+        company: "",
+        jobTitle: "",
+        employeeCount: "",
+        message: ""
+      });
+    }, 1500);
+  };
+
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -199,22 +251,133 @@ const Enterprise = () => {
           </div>
         </section>
 
-        {/* CTA Section */}
+        {/* CTA Section with Contact Form */}
         <section className="py-16 md:py-20 bg-upwork-green text-white">
-          <div className="container-custom text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
-              Ready to transform how your business works?
-            </h2>
-            <p className="text-xl mb-8 max-w-2xl mx-auto opacity-90">
-              Contact our sales team to learn how Upwork Enterprise can help your business.
-            </p>
-            <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Button className="bg-white text-upwork-green hover:bg-gray-100 font-medium py-6 px-8 text-lg">
-                Contact Sales
-              </Button>
-              <Button variant="outline" className="border-white text-white hover:bg-white/10 font-medium py-6 px-8 text-lg">
-                Request Demo
-              </Button>
+          <div className="container-custom">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+              <div>
+                <h2 className="text-3xl md:text-4xl font-bold mb-6">
+                  Ready to transform how your business works?
+                </h2>
+                <p className="text-xl mb-8 max-w-2xl opacity-90">
+                  Contact our sales team to learn how Upwork Enterprise can help your business.
+                </p>
+                <ul className="space-y-3">
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2" />
+                    <span>Get a customized solution for your business needs</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2" />
+                    <span>Discuss compliance and security requirements</span>
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2" />
+                    <span>Learn about our enterprise-grade features</span>
+                  </li>
+                </ul>
+              </div>
+              
+              <div className="bg-white text-upwork-black p-8 rounded-lg shadow-lg">
+                <h3 className="text-2xl font-bold mb-6">Contact Sales</h3>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name">Full Name *</Label>
+                      <Input
+                        id="name"
+                        name="name"
+                        placeholder="Enter your full name"
+                        value={formData.name}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Work Email *</Label>
+                      <Input
+                        id="email"
+                        name="email"
+                        type="email"
+                        placeholder="name@company.com"
+                        value={formData.email}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="company">Company Name *</Label>
+                      <Input
+                        id="company"
+                        name="company"
+                        placeholder="Your company name"
+                        value={formData.company}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="jobTitle">Job Title *</Label>
+                      <Input
+                        id="jobTitle"
+                        name="jobTitle"
+                        placeholder="Your job title"
+                        value={formData.jobTitle}
+                        onChange={handleChange}
+                        required
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="employeeCount">Company Size *</Label>
+                    <Select 
+                      onValueChange={handleSelectChange}
+                      value={formData.employeeCount}
+                      required
+                    >
+                      <SelectTrigger id="employeeCount">
+                        <SelectValue placeholder="Select company size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1-10">1-10 employees</SelectItem>
+                        <SelectItem value="11-50">11-50 employees</SelectItem>
+                        <SelectItem value="51-200">51-200 employees</SelectItem>
+                        <SelectItem value="201-500">201-500 employees</SelectItem>
+                        <SelectItem value="501+">501+ employees</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="message">How can we help? *</Label>
+                    <Textarea
+                      id="message"
+                      name="message"
+                      placeholder="Tell us about your needs and requirements"
+                      rows={4}
+                      value={formData.message}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+                  
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-upwork-green hover:bg-upwork-dark-green text-white"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? "Submitting..." : "Submit Request"}
+                  </Button>
+                  
+                  <p className="text-xs text-upwork-gray text-center">
+                    By submitting this form, you agree to our privacy policy and terms of service.
+                  </p>
+                </form>
+              </div>
             </div>
           </div>
         </section>

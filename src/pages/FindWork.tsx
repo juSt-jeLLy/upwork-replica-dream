@@ -1,5 +1,5 @@
-
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Button } from "@/components/ui/button";
@@ -109,6 +109,16 @@ const popularCategories = [
 ];
 
 const FindWork = () => {
+  const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/jobs?query=${encodeURIComponent(searchQuery)}`);
+    }
+  };
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -125,18 +135,20 @@ const FindWork = () => {
               </p>
               
               <div className="bg-white p-6 rounded-lg shadow-md">
-                <div className="flex flex-col md:flex-row gap-4">
+                <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4">
                   <div className="flex-grow">
                     <Input 
                       placeholder="Search for jobs (e.g. Web Developer, Designer)" 
                       className="h-12 text-lg"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                   </div>
-                  <Button className="h-12 bg-upwork-green hover:bg-upwork-dark-green text-white font-medium">
+                  <Button type="submit" className="h-12 bg-upwork-green hover:bg-upwork-dark-green text-white font-medium">
                     <Search className="mr-2 h-5 w-5" />
                     Search Jobs
                   </Button>
-                </div>
+                </form>
               </div>
             </div>
           </div>
