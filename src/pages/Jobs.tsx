@@ -77,7 +77,7 @@ const Jobs = () => {
       <Navbar />
       <main className="flex-grow bg-gray-50 py-8">
         <div className="container-custom">
-          <h1 className="text-2xl md:text-3xl font-bold mb-6">Browse Jobs</h1>
+          <h1 className="text-2xl md:text-3xl font-bold mb-6">Jobs</h1>
           
           {/* Search box */}
           <div className="mb-6">
